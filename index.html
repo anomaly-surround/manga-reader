@@ -520,9 +520,9 @@
                     <h3>Chapters (${chapters.length})</h3>
                     ${chapters.length === 0 ? '<p style="color:#475569">No chapters available for reading</p>' : ''}
                     ${chapters.map((ch, i) => `
-                        <div class="chapter-item ${readSet.includes(ch.id) ? 'read' : ''}" onclick="readChapter(${i})">
+                        <div class="chapter-item ${readSet.includes(ch.id) ? 'read' : ''}" onclick="${ch.externalUrl && !ch.pages ? `window.open('${ch.externalUrl}','_blank')` : `readChapter(${i})`}">
                             <span class="chapter-num">Ch. ${ch.chapter || '?'}</span>
-                            <span class="chapter-title">${ch.title || ''}</span>
+                            <span class="chapter-title">${ch.title || ''}${ch.externalUrl && !ch.pages ? ' &#x2197;' : ''}</span>
                             <span class="chapter-group">${ch.group}</span>
                         </div>
                     `).join('')}
@@ -549,9 +549,9 @@
                 listEl.innerHTML = `
                     <h3>Chapters (${chapters.length})</h3>
                     ${chapters.map((ch, i) => `
-                        <div class="chapter-item ${readSet.includes(ch.id) ? 'read' : ''}" onclick="readChapter(${i})">
+                        <div class="chapter-item ${readSet.includes(ch.id) ? 'read' : ''}" onclick="${ch.externalUrl && !ch.pages ? `window.open('${ch.externalUrl}','_blank')` : `readChapter(${i})`}">
                             <span class="chapter-num">Ch. ${ch.chapter || '?'}</span>
-                            <span class="chapter-title">${ch.title || ''}</span>
+                            <span class="chapter-title">${ch.title || ''}${ch.externalUrl && !ch.pages ? ' &#x2197;' : ''}</span>
                             <span class="chapter-group">${ch.group}</span>
                         </div>
                     `).join('')}

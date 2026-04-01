@@ -174,29 +174,37 @@ function formatMangaDetail(m) {
 function formatChapterList(data) {
   if (data.result !== 'ok') return { chapters: [], total: 0 };
 
-  const seen = new Set();
+  const seen = new Map();
   const chapters = [];
 
   for (const ch of data.data) {
     const attrs = ch.attributes;
-    // Skip external-only chapters
-    if (attrs.externalUrl && attrs.pages === 0) continue;
-    // Deduplicate by chapter number
+    // Deduplicate by chapter number — prefer hosted over external
     const key = attrs.chapter || ch.id;
-    if (seen.has(key)) continue;
-    seen.add(key);
+    const existing = seen.get(key);
+    if (existing && existing.pages > 0) continue; // already have a hosted version
+    if (existing && attrs.pages === 0 && existing.pages === 0) continue; // both external, skip dupe
 
     const group = ch.relationships.find(r => r.type === 'scanlation_group');
-
-    chapters.push({
+    const entry = {
       id: ch.id,
       chapter: attrs.chapter,
       title: attrs.title,
       volume: attrs.volume,
       pages: attrs.pages,
+      externalUrl: attrs.externalUrl || null,
       group: group?.attributes?.name || 'Unknown',
       publishAt: attrs.publishAt,
-    });
+    };
+
+    if (existing) {
+      // Replace with better version
+      const idx = chapters.findIndex(c => (c.chapter || c.id) === key);
+      if (idx >= 0) chapters[idx] = entry;
+    } else {
+      chapters.push(entry);
+    }
+    seen.set(key, entry);
   }
 
   return {
